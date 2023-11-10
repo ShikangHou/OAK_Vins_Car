@@ -1,0 +1,7 @@
+<launch>
+    <include file="/home/hsk/depthai/depthai_ws/src/VINS-Fusion/vins_estimator/launch/vins_rviz.launch" />
+    <include file="/home/hsk/depthai/depthai_ws/src/depthai-ros/depthai_ros/launch/stereo_inertial_node.launch" />
+    <node pkg="vins" type="vins_node" name="vins_estimator" args="/home/hsk/depthai/depthai_ws/src/VINS-Fusion/config/depthai/oak_stereo_imu_config.yaml" output="screen"/>
+    <!-- <node pkg="loop_fusion" type="loop_fusion_node" name="loop_fusion_node" args="/home/hsk/depthai/depthai_ws/src/VINS-Fusion/config/depthai/config.yaml"/> -->
+
+</launch>

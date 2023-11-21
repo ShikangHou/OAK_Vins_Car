@@ -16,11 +16,12 @@ namespace depthimage_to_laserscan
     {
     private:
         image_geometry::PinholeCameraModel cam_model_;
+        float scan_time_;
         bool inited_;
         float angle_max_;
         float angle_min_;
+        float angle_increment_;
         std::string output_frame_id_;
-        float scan_time_;
         float range_max_;
         float range_min_;
         int scan_height_;
@@ -28,19 +29,19 @@ namespace depthimage_to_laserscan
         int scan_center_;
         float height_min_;
         float height_max_;
+        float rect_pixel_right_x_;
+        float rect_pixel_left_x_;
 
     public:
-        DepthimageToLaserscan::DepthimageToLaserscan(std::string output_frame_id,
-                                             float angle_min,
-                                             float angle_max,
-                                             float scan_time,
-                                             float range_max,
-                                             float range_min,
-                                             int scan_height,
-                                             int group_size,
-                                             int &scan_center,
-                                             float height_min,
-                                             float height_max);
+        DepthimageToLaserscan(std::string output_frame_id,
+                                                     float scan_time,
+                                                     float range_min,
+                                                     float range_max, 
+                                                     int scan_height,
+                                                     int group_size,
+                                                     int scan_center,
+                                                     float height_min,
+                                                     float height_max);
         ~DepthimageToLaserscan();
 
         bool usePoint(const float new_value, const float old_value, const float range_min, const float range_max) const;

@@ -1,0 +1,19 @@
+<launch>
+    <node pkg="depthimage_to_laserscan_hsk" type="depthimage_to_laserscan_node" name="image_to_laser" output="screen">
+        <param name="output_fream_id" type="str" value="oak-d_frame" />
+        <param name="scan_time"  value="0.033" />
+        <param name="scan_height" value="20" />
+        <param name="group_size" value="5" />
+        <param name="scan_center" value="360" />
+        <param name="height_min" value="-1" />
+        <param name="height_max" value="1" />
+        <param name="range_min" value="0.2" />
+        <param name="range_max" value="10" />
+
+        <remap from="image"       to="/stereo_inertial_publisher/stereo/depth"/> 
+        <remap from="camera_info" to="/stereo_inertial_publisher/stereo/camera_info"/> 
+        <remap from="laserscan" to="/depth_scan"/> 
+
+    </node>     
+
+</launch>

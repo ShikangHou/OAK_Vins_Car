@@ -20,9 +20,8 @@ namespace depthimage_to_laserscan
     ros::NodeHandle pnh_;
     image_transport::ImageTransport it_;
     image_transport::CameraSubscriber sub_;
-    image_transport::Publisher it_pub_;
     ros::Publisher pub_;
-    
+
     std::mutex connect_mutex_;
 
   public:
@@ -30,7 +29,7 @@ namespace depthimage_to_laserscan
     void connectCb(const ros::SingleSubscriberPublisher &pub);
     void disconnectCb(const ros::SingleSubscriberPublisher &pub);
     void depthCb(const sensor_msgs::ImageConstPtr &depth_msg,
-                                           const sensor_msgs::CameraInfoConstPtr &info_msg);
+                 const sensor_msgs::CameraInfoConstPtr &info_msg);
   };
 
 }

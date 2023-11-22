@@ -25,7 +25,6 @@ DepthImageToLaserScanROS::DepthImageToLaserScanROS(ros::NodeHandle &nh, ros::Nod
         throw std::runtime_error("Couldn't find %d of the parameters");
     }
 
-    it_pub_ = it_.advertise("/it_cam",2);
     dtl_ = new DepthimageToLaserscan(output_frame_id, scan_time, range_min, range_max, scan_height, group_size, scan_center, height_min, height_max);
     pub_ = nh_.advertise<sensor_msgs::LaserScan>("/laserscan", 10, std::bind(&DepthImageToLaserScanROS::connectCb, this, std::placeholders::_1), std::bind(&DepthImageToLaserScanROS::disconnectCb, this, std::placeholders::_1));
 }
@@ -57,10 +56,7 @@ void DepthImageToLaserScanROS::depthCb(const sensor_msgs::ImageConstPtr &depth_m
 {
     try
     {
-        cv::Mat image = cv_bridge::toCvCopy(depth_msg, depth_msg->encoding)->image;
-        sensor_msgs::ImagePtr msg = cv_bridge::CvImage(std_msgs::Header(), depth_msg->encoding, image).toImageMsg();
-        it_pub_.publish(depth_msg);
-        sensor_msgs::LaserScanPtr scan_msg = dtl_->convert_msg(depth_msg, image, info_msg);
+        sensor_msgs::LaserScanPtr scan_msg = dtl_->convert_msg(depth_msg, info_msg);
         pub_.publish(scan_msg);
         
     }

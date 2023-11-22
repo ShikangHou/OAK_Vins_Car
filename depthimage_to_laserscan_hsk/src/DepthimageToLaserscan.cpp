@@ -81,8 +81,7 @@ bool DepthimageToLaserscan::usePoint(const float new_value, const float range_mi
     return ranger_checker;
 }
 
-sensor_msgs::LaserScanPtr DepthimageToLaserscan::convert_msg(const sensor_msgs::ImageConstPtr &depth_msg, const cv::Mat &image,
-                                                             const sensor_msgs::CameraInfoConstPtr &info_msg)
+sensor_msgs::LaserScanPtr DepthimageToLaserscan::convert_msg(const sensor_msgs::ImageConstPtr &depth_msg, const sensor_msgs::CameraInfoConstPtr &info_msg)
 {
     if (!inited_)
     {
@@ -107,9 +106,6 @@ sensor_msgs::LaserScanPtr DepthimageToLaserscan::convert_msg(const sensor_msgs::
         rect_pixel_right_x_ = rect_pixel_right.x;
         inited_ = true;
     }
-
-    cv::Mat img;
-    cam_model_.rectifyImage(image, img);
 
     sensor_msgs::LaserScanPtr scan_msg(new sensor_msgs::LaserScan());
     scan_msg->header = depth_msg->header;
@@ -138,11 +134,11 @@ sensor_msgs::LaserScanPtr DepthimageToLaserscan::convert_msg(const sensor_msgs::
 
     if (depth_msg->encoding == sensor_msgs::image_encodings::TYPE_16UC1)
     {
-        convert<uint16_t>(img, scan_msg);
+        convert<uint16_t>(depth_msg, scan_msg);
     }
     else if (depth_msg->encoding == sensor_msgs::image_encodings::TYPE_32FC1)
     {
-        convert<float>(img, scan_msg);
+        convert<float>(depth_msg, scan_msg);
     }
     else
     {
@@ -155,7 +151,7 @@ sensor_msgs::LaserScanPtr DepthimageToLaserscan::convert_msg(const sensor_msgs::
 }
 
 template <typename T>
-void DepthimageToLaserscan::convert(const cv::Mat &depth_msg, const sensor_msgs::LaserScanPtr &scan_msg) const
+void DepthimageToLaserscan::convert(const sensor_msgs::ImageConstPtr &depth_msg, const sensor_msgs::LaserScanPtr &scan_msg) const
 {
     const float center_x = cam_model_.cx();
     const float center_y = cam_model_.cy();
@@ -169,17 +165,20 @@ void DepthimageToLaserscan::convert(const cv::Mat &depth_msg, const sensor_msgs:
     {
         const double angle = -atan2f((float)(u - center_x), cam_model_.fx());
         const int index = (angle - scan_msg->angle_min) / scan_msg->angle_increment;
+        const int row_step = depth_msg->step / sizeof(T);
 
         for (size_t v = scan_center_ - 0.5 * group_size_ * scan_height_; v <= scan_center_ + 0.5 * group_size_ * scan_height_; v += group_size_)
         {
             bool sign = false;
             T min_d = range_max_piexl;
             cv::Point point;
-  
+
             for (size_t i = 0; i < group_size_; i++)
             {
-                T depth = depth_msg.at<T>(v + i, u);
-                if(depth > 65535) continue;
+                const T *depth_row = reinterpret_cast<const T *>(&depth_msg->data[0]);
+                T depth = depth_row[row_step * v + u];
+
+                // T depth = depth_msg->data.at(row_step * v + u);
 
                 if (depthimage_to_laserscan::DepthTraits<T>::valid(depth))
                 {
@@ -187,7 +186,7 @@ void DepthimageToLaserscan::convert(const cv::Mat &depth_msg, const sensor_msgs:
                     {
                         min_d = depth;
                         point = cv::Point(u, v + i);
-                        sign = true;                   
+                        sign = true;
                     }
                 }
             }
@@ -204,7 +203,6 @@ void DepthimageToLaserscan::convert(const cv::Mat &depth_msg, const sensor_msgs:
                 {
                     scan_msg->ranges[index] = r;
                 }
-                if(r < 1.0) std::cout<<depth_msg.at<T>(point.y,point.x)<<" "<<r<<std::endl;
             }
         }
     }

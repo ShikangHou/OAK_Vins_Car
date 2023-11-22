@@ -34,25 +34,24 @@ namespace depthimage_to_laserscan
 
     public:
         DepthimageToLaserscan(std::string output_frame_id,
-                                                     float scan_time,
-                                                     float range_min,
-                                                     float range_max, 
-                                                     int scan_height,
-                                                     int group_size,
-                                                     int scan_center,
-                                                     float height_min,
-                                                     float height_max);
+                              float scan_time,
+                              float range_min,
+                              float range_max,
+                              int scan_height,
+                              int group_size,
+                              int scan_center,
+                              float height_min,
+                              float height_max);
         ~DepthimageToLaserscan();
 
         bool usePoint(const float new_value, const float old_value, const float range_min, const float range_max) const;
         bool usePoint(const float value, const float range_min, const float range_max) const;
         double magnitude_of_ray(const cv::Point3d ray) const;
         double angle_of_rays(const cv::Point3d ray1, cv::Point3d ray2) const;
-        sensor_msgs::LaserScanPtr convert_msg(const sensor_msgs::ImageConstPtr &depth_msg, const cv::Mat &image,
+        sensor_msgs::LaserScanPtr convert_msg(const sensor_msgs::ImageConstPtr &depth_msg,
                                               const sensor_msgs::CameraInfoConstPtr &info_msg);
-
         template <typename T>
-        void convert(const cv::Mat &depth_msg, const sensor_msgs::LaserScanPtr &scan_msg) const;
+        void convert(const sensor_msgs::ImageConstPtr &depth_msg, const sensor_msgs::LaserScanPtr &scan_msg) const;
     };
 
 };

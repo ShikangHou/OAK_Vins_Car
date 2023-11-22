@@ -14,7 +14,7 @@ namespace depthimage_to_laserscan
     template <>
     struct DepthTraits<uint16_t>
     {
-        static inline bool valid(uint16_t depth) { return (depth > 200); }
+        static inline bool valid(uint16_t depth) { return (depth != 0); }
         static inline float toMeters(uint16_t depth) { return depth * 0.001f; }
     };
 
